@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HarnessForge.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f0073415863c53526c303b79805c38a836b46060")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+de2b944d560aa9db2117e76624bbaf784cd04c4e")]
 [assembly: System.Reflection.AssemblyProductAttribute("HarnessForge.App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HarnessForge.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
