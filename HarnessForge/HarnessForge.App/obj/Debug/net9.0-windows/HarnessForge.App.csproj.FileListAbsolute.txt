@@ -17,3 +17,4 @@ C:\Users\eyfim\source\repos\MumKlaufi\HarnessForge\HarnessForge\HarnessForge.App
 C:\Users\eyfim\source\repos\MumKlaufi\HarnessForge\HarnessForge\HarnessForge.App\obj\Debug\net9.0-windows\HarnessForge.App.pdb
 C:\Users\eyfim\source\repos\MumKlaufi\HarnessForge\HarnessForge\HarnessForge.App\obj\Debug\net9.0-windows\HarnessForge.App.genruntimeconfig.cache
 C:\Users\eyfim\source\repos\MumKlaufi\HarnessForge\HarnessForge\HarnessForge.App\obj\Debug\net9.0-windows\ref\HarnessForge.App.dll
+C:\Users\eyfim\source\repos\MumKlaufi\HarnessForge\HarnessForge\HarnessForge.App\obj\Debug\net9.0-windows\HarnessForge.App.sourcelink.json
