@@ -140,24 +140,12 @@
 							</TreeViewItem>
 						</TreeViewItem>
 
-						<TreeViewItem Header="Projects"
-                                      Tag="Projects"
-                                      IsExpanded="True">
-
-							<TreeViewItem Header="Test Project"
-                                          Tag="TestProject"
-                                          IsExpanded="True">
-
-								<TreeViewItem Header="Devices"
-                                              Tag="ProjectDevices"/>
-
-								<TreeViewItem Header="Wires"
-                                              Tag="ProjectWires"/>
-
-								<TreeViewItem Header="Validation"
-                                              Tag="ProjectValidation"/>
+						<TreeViewItem x:Name="ProjectsNode"
+									  Header="Projects"
+									  Tag="Projects"
+									  IsExpanded="True">
 							</TreeViewItem>
-						</TreeViewItem>
+						
 					</TreeView>
 				</DockPanel>
 			</Border>

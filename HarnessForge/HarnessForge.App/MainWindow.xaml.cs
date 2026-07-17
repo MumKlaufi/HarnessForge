@@ -5,6 +5,12 @@ namespace HarnessForge.App;
 
 public partial class MainWindow : Window
 {
+    private TreeViewItem? _currentProjectNode;
+    private TreeViewItem? _projectDevicesNode;
+
+    private int _projectNumber = 1;
+    private int _deviceNumber = 1;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -20,13 +26,23 @@ public partial class MainWindow : Window
         }
 
         string tag = selectedItem.Tag?.ToString() ?? string.Empty;
+        string? selectedHeader = selectedItem.Header?.ToString();
 
-        ShowItemDetails(tag);
+        ShowItemDetails(tag, selectedHeader);
     }
 
-    private void ShowItemDetails(string tag)
+    private void ShowItemDetails(
+        string tag,
+        string? selectedHeader)
     {
         ResetDetails();
+
+        string SelectedHeaderOrFallback(string fallback)
+        {
+            return string.IsNullOrWhiteSpace(selectedHeader)
+                ? fallback
+                : selectedHeader;
+        }
 
         switch (tag)
         {
@@ -35,8 +51,10 @@ public partial class MainWindow : Window
                 DetailsSubtitle.Text = "Reusable engineering knowledge";
                 TypeValue.Text = "Library";
                 StatusValue.Text = "Loaded";
+
                 DescriptionValue.Text =
-                    "The library contains manufacturers, devices, connectors, contacts, seals and other reusable engineering definitions.";
+                    "The library contains manufacturers, devices, connectors, " +
+                    "contacts, seals and other reusable engineering definitions.";
                 break;
 
             case "Manufacturers":
@@ -44,6 +62,7 @@ public partial class MainWindow : Window
                 DetailsSubtitle.Text = "Component manufacturers";
                 TypeValue.Text = "Collection";
                 StatusValue.Text = "1 manufacturer";
+
                 DescriptionValue.Text =
                     "Manufacturers organize engineering products and source information.";
                 break;
@@ -54,6 +73,7 @@ public partial class MainWindow : Window
                 TypeValue.Text = "Manufacturer";
                 ManufacturerValue.Text = "MaxxECU";
                 StatusValue.Text = "Sample data";
+
                 DescriptionValue.Text =
                     "This manufacturer currently contains three sample device definitions.";
                 break;
@@ -64,37 +84,42 @@ public partial class MainWindow : Window
                 TypeValue.Text = "Collection";
                 ManufacturerValue.Text = "MaxxECU";
                 StatusValue.Text = "3 devices";
+
                 DescriptionValue.Text =
                     "Choose a device to inspect its engineering definition.";
                 break;
 
             case "MaxxECURace":
                 ShowDevice(
-                    "MaxxECU Race",
-                    "Engine Control Unit",
-                    "4",
-                    "124",
-                    "Sample definition",
-                    "A high-capability engine control unit represented here using temporary sample engineering data.");
+                    name: "MaxxECU Race",
+                    subtitle: "Engine Control Unit",
+                    connectorCount: "4",
+                    pinCount: "124",
+                    status: "Sample definition",
+                    description:
+                    "A high-capability engine control unit represented using " +
+                    "temporary sample engineering data.");
                 break;
 
             case "MaxxECUPro":
                 ShowDevice(
-                    "MaxxECU Pro",
-                    "Engine Control Unit",
-                    "3",
-                    "96",
-                    "Sample definition",
+                    name: "MaxxECU Pro",
+                    subtitle: "Engine Control Unit",
+                    connectorCount: "3",
+                    pinCount: "96",
+                    status: "Sample definition",
+                    description:
                     "A sample device included to test navigation and library browsing.");
                 break;
 
             case "MaxxECUMini":
                 ShowDevice(
-                    "MaxxECU Mini",
-                    "Engine Control Unit",
-                    "2",
-                    "48",
-                    "Sample definition",
+                    name: "MaxxECU Mini",
+                    subtitle: "Engine Control Unit",
+                    connectorCount: "2",
+                    pinCount: "48",
+                    status: "Sample definition",
+                    description:
                     "A smaller sample ECU definition used for the first Explorer prototype.");
                 break;
 
@@ -105,24 +130,42 @@ public partial class MainWindow : Window
                 ManufacturerValue.Text = "MaxxECU";
                 ConnectorsValue.Text = "4";
                 StatusValue.Text = "Sample data";
+
                 DescriptionValue.Text =
-                    "Connector definitions contain cavities, compatible contacts, seals and mating information.";
+                    "Connector definitions contain cavities, compatible contacts, " +
+                    "seals and mating information.";
                 break;
 
             case "ConnectorA":
-                ShowConnector("Connector A", "34", "Black", "Active");
+                ShowConnector(
+                    name: "Connector A",
+                    cavityCount: "34",
+                    colour: "Black",
+                    status: "Active");
                 break;
 
             case "ConnectorB":
-                ShowConnector("Connector B", "34", "Grey", "Active");
+                ShowConnector(
+                    name: "Connector B",
+                    cavityCount: "34",
+                    colour: "Grey",
+                    status: "Active");
                 break;
 
             case "ConnectorC":
-                ShowConnector("Connector C", "28", "Black", "Active");
+                ShowConnector(
+                    name: "Connector C",
+                    cavityCount: "28",
+                    colour: "Black",
+                    status: "Active");
                 break;
 
             case "ConnectorD":
-                ShowConnector("Connector D", "28", "Grey", "Active");
+                ShowConnector(
+                    name: "Connector D",
+                    cavityCount: "28",
+                    colour: "Grey",
+                    status: "Active");
                 break;
 
             case "Contacts":
@@ -130,8 +173,10 @@ public partial class MainWindow : Window
                 DetailsSubtitle.Text = "Electrical terminal definitions";
                 TypeValue.Text = "Collection";
                 StatusValue.Text = "Sample data";
+
                 DescriptionValue.Text =
-                    "Contacts will eventually include wire-size compatibility, plating, current rating and tooling requirements.";
+                    "Contacts will eventually include wire-size compatibility, " +
+                    "plating, current rating and tooling requirements.";
                 break;
 
             case "Seals":
@@ -139,35 +184,53 @@ public partial class MainWindow : Window
                 DetailsSubtitle.Text = "Environmental sealing components";
                 TypeValue.Text = "Collection";
                 StatusValue.Text = "Sample data";
+
                 DescriptionValue.Text =
-                    "Seals will be selected according to connector cavity and wire diameter compatibility.";
+                    "Seals will be selected according to connector cavity and " +
+                    "wire diameter compatibility.";
                 break;
 
             case "Projects":
                 DetailsTitle.Text = "Projects";
                 DetailsSubtitle.Text = "Harness engineering projects";
                 TypeValue.Text = "Collection";
-                StatusValue.Text = "1 project";
+                StatusValue.Text =
+                    ProjectsNode.Items.Count == 0
+                        ? "No projects"
+                        : $"{ProjectsNode.Items.Count} project(s)";
+
                 DescriptionValue.Text =
-                    "Projects will contain instantiated devices, connectors, pins, wires and engineering decisions.";
+                    "Projects contain instantiated devices, connectors, pins, " +
+                    "wires and engineering decisions.";
                 break;
 
-            case "TestProject":
-                DetailsTitle.Text = "Test Project";
-                DetailsSubtitle.Text = "Prototype harness project";
+            case "DynamicProject":
+                DetailsTitle.Text =
+                    SelectedHeaderOrFallback("Harness Project");
+
+                DetailsSubtitle.Text = "Active engineering project";
                 TypeValue.Text = "Project";
                 StatusValue.Text = "Draft";
+
                 DescriptionValue.Text =
-                    "This project is currently only a navigation placeholder. Device generation will be added next.";
+                    "This project was created during the current HarnessForge session.";
                 break;
 
             case "ProjectDevices":
                 DetailsTitle.Text = "Project Devices";
                 DetailsSubtitle.Text = "Devices instantiated in this project";
                 TypeValue.Text = "Collection";
-                StatusValue.Text = "Empty";
+
+                int projectDeviceCount =
+                    _projectDevicesNode?.Items.Count ?? 0;
+
+                StatusValue.Text =
+                    projectDeviceCount == 0
+                        ? "Empty"
+                        : $"{projectDeviceCount} device(s)";
+
                 DescriptionValue.Text =
-                    "The next prototype will allow a library device to be added here.";
+                    "Devices added to the active project appear in this collection.";
                 break;
 
             case "ProjectWires":
@@ -175,8 +238,10 @@ public partial class MainWindow : Window
                 DetailsSubtitle.Text = "Electrical connections";
                 TypeValue.Text = "Collection";
                 StatusValue.Text = "Not implemented";
+
                 DescriptionValue.Text =
-                    "Wire creation will come after device and connector generation are working.";
+                    "Wire creation will be added after device and connector " +
+                    "generation are working.";
                 break;
 
             case "ProjectValidation":
@@ -184,13 +249,71 @@ public partial class MainWindow : Window
                 DetailsSubtitle.Text = "Engineering checks";
                 TypeValue.Text = "Validation";
                 StatusValue.Text = "Not run";
+
                 DescriptionValue.Text =
-                    "Validation will eventually explain errors, warnings and suggested engineering corrections.";
+                    "Validation will eventually explain errors, warnings and " +
+                    "suggested engineering corrections.";
+                break;
+
+            case "GeneratedMaxxECURace":
+                ShowDevice(
+                    name: SelectedHeaderOrFallback("MaxxECU Race"),
+                    subtitle: "Generated Project Device",
+                    connectorCount: "4",
+                    pinCount: "124",
+                    status: "Generated",
+                    description:
+                    "This project device was instantiated from the sample " +
+                    "MaxxECU Race library definition.");
+                break;
+
+            case "GeneratedConnectors":
+                DetailsTitle.Text = "Generated Connectors";
+                DetailsSubtitle.Text = "Project connector instances";
+                TypeValue.Text = "Collection";
+                ConnectorsValue.Text = "4";
+                StatusValue.Text = "Generated";
+
+                DescriptionValue.Text =
+                    "These connector instances were generated from the selected " +
+                    "device definition.";
+                break;
+
+            case "GeneratedConnector":
+                DetailsTitle.Text =
+                    SelectedHeaderOrFallback("Connector");
+
+                DetailsSubtitle.Text = "Generated Project Connector";
+                TypeValue.Text = "Connector";
+                ManufacturerValue.Text = "Sample connector family";
+                ConnectorsValue.Text = "1";
+                StatusValue.Text = "Generated";
+
+                DescriptionValue.Text =
+                    "This is a project-specific connector instance generated " +
+                    "from library knowledge.";
+                break;
+
+            case "GeneratedPins":
+                DetailsTitle.Text =
+                    SelectedHeaderOrFallback("Pins");
+
+                DetailsSubtitle.Text = "Generated connector cavities";
+                TypeValue.Text = "Pin collection";
+                StatusValue.Text = "Generated";
+
+                DescriptionValue.Text =
+                    "Individual pin objects will be displayed in a later prototype.";
                 break;
 
             default:
                 DetailsTitle.Text = "HarnessForge Explorer";
                 DetailsSubtitle.Text = "Select an engineering object";
+                TypeValue.Text = "-";
+                StatusValue.Text = "-";
+
+                DescriptionValue.Text =
+                    "Select an item in the engineering tree to inspect its details.";
                 break;
         }
 
@@ -199,25 +322,25 @@ public partial class MainWindow : Window
 
     private void ShowDevice(
         string name,
-        string type,
-        string connectors,
-        string pins,
+        string subtitle,
+        string connectorCount,
+        string pinCount,
         string status,
         string description)
     {
         DetailsTitle.Text = name;
-        DetailsSubtitle.Text = type;
+        DetailsSubtitle.Text = subtitle;
         TypeValue.Text = "Device";
         ManufacturerValue.Text = "MaxxECU";
-        ConnectorsValue.Text = connectors;
-        PinsValue.Text = pins;
+        ConnectorsValue.Text = connectorCount;
+        PinsValue.Text = pinCount;
         StatusValue.Text = status;
         DescriptionValue.Text = description;
     }
 
     private void ShowConnector(
         string name,
-        string cavities,
+        string cavityCount,
         string colour,
         string status)
     {
@@ -226,52 +349,225 @@ public partial class MainWindow : Window
         TypeValue.Text = "Connector";
         ManufacturerValue.Text = "Sample connector family";
         ConnectorsValue.Text = "1";
-        PinsValue.Text = cavities;
+        PinsValue.Text = cavityCount;
         StatusValue.Text = status;
+
         DescriptionValue.Text =
-            $"{name} is a {colour.ToLowerInvariant()} connector with {cavities} sample cavities.";
+            $"{name} is a {colour.ToLowerInvariant()} connector " +
+            $"with {cavityCount} sample cavities.";
     }
 
     private void ResetDetails()
     {
+        DetailsTitle.Text = "HarnessForge Explorer";
+        DetailsSubtitle.Text = "Select an item from the engineering tree.";
+
         TypeValue.Text = "-";
         ManufacturerValue.Text = "-";
         ConnectorsValue.Text = "-";
         PinsValue.Text = "-";
         StatusValue.Text = "-";
-        DescriptionValue.Text = string.Empty;
+
+        DescriptionValue.Text =
+            "This is the first interactive HarnessForge prototype.";
     }
 
-    private void NewProjectButton_Click(object sender, RoutedEventArgs e)
+    private void NewProjectButton_Click(
+        object sender,
+        RoutedEventArgs e)
     {
-        MessageBox.Show(
-            "Project creation will be added in the next prototype.",
-            "HarnessForge",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+        string projectName = $"Harness Project {_projectNumber}";
+
+        TreeViewItem projectDevicesNode = new()
+        {
+            Header = "Devices",
+            Tag = "ProjectDevices",
+            IsExpanded = true
+        };
+
+        TreeViewItem wiresNode = new()
+        {
+            Header = "Wires",
+            Tag = "ProjectWires"
+        };
+
+        TreeViewItem validationNode = new()
+        {
+            Header = "Validation",
+            Tag = "ProjectValidation"
+        };
+
+        TreeViewItem projectNode = new()
+        {
+            Header = projectName,
+            Tag = "DynamicProject",
+            IsExpanded = true
+        };
+
+        projectNode.Items.Add(projectDevicesNode);
+        projectNode.Items.Add(wiresNode);
+        projectNode.Items.Add(validationNode);
+
+        ProjectsNode.Items.Add(projectNode);
+        ProjectsNode.IsExpanded = true;
+
+        _currentProjectNode = projectNode;
+        _projectDevicesNode = projectDevicesNode;
+
+        _projectNumber++;
+        _deviceNumber = 1;
+
+        projectNode.IsSelected = true;
+        projectNode.BringIntoView();
+
+        StatusText.Text = $"Created project: {projectName}";
     }
 
-    private void AddDeviceButton_Click(object sender, RoutedEventArgs e)
+    private void AddDeviceButton_Click(
+        object sender,
+        RoutedEventArgs e)
     {
-        MessageBox.Show(
-            "Device generation is the next feature we will build.",
-            "HarnessForge",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+        if (_currentProjectNode is null ||
+            _projectDevicesNode is null)
+        {
+            MessageBox.Show(
+                "Create a project before adding a device.",
+                "HarnessForge",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            return;
+        }
+
+        string deviceName =
+            _deviceNumber == 1
+                ? "MaxxECU Race"
+                : $"MaxxECU Race {_deviceNumber}";
+
+        TreeViewItem connectorsNode = new()
+        {
+            Header = "Connectors",
+            Tag = "GeneratedConnectors",
+            IsExpanded = true
+        };
+
+        connectorsNode.Items.Add(
+            CreateConnectorNode(
+                connectorName: "Connector A",
+                cavityCount: 34));
+
+        connectorsNode.Items.Add(
+            CreateConnectorNode(
+                connectorName: "Connector B",
+                cavityCount: 34));
+
+        connectorsNode.Items.Add(
+            CreateConnectorNode(
+                connectorName: "Connector C",
+                cavityCount: 28));
+
+        connectorsNode.Items.Add(
+            CreateConnectorNode(
+                connectorName: "Connector D",
+                cavityCount: 28));
+
+        TreeViewItem deviceNode = new()
+        {
+            Header = deviceName,
+            Tag = "GeneratedMaxxECURace",
+            IsExpanded = true
+        };
+
+        deviceNode.Items.Add(connectorsNode);
+
+        _projectDevicesNode.Items.Add(deviceNode);
+        _projectDevicesNode.IsExpanded = true;
+
+        _deviceNumber++;
+
+        deviceNode.IsSelected = true;
+        deviceNode.BringIntoView();
+
+        StatusText.Text =
+            $"Added {deviceName}: 4 connectors and 124 pins generated";
     }
 
-    private void ValidateButton_Click(object sender, RoutedEventArgs e)
+    private static TreeViewItem CreateConnectorNode(
+        string connectorName,
+        int cavityCount)
     {
+        TreeViewItem pinsNode = new()
+        {
+            Header = $"Pins ({cavityCount} cavities)",
+            Tag = "GeneratedPins"
+        };
+
+        TreeViewItem connectorNode = new()
+        {
+            Header = connectorName,
+            Tag = "GeneratedConnector"
+        };
+
+        connectorNode.Items.Add(pinsNode);
+
+        return connectorNode;
+    }
+
+    private void ValidateButton_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (_currentProjectNode is null)
+        {
+            MessageBox.Show(
+                "Create a project before running validation.",
+                "HarnessForge Validation",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            StatusText.Text =
+                "Validation could not run: no active project";
+
+            return;
+        }
+
+        int deviceCount =
+            _projectDevicesNode?.Items.Count ?? 0;
+
+        if (deviceCount == 0)
+        {
+            MessageBox.Show(
+                "Validation complete.\n\n" +
+                "0 errors\n" +
+                "1 warning\n\n" +
+                "The project does not contain any devices.",
+                "HarnessForge Validation",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            StatusText.Text =
+                "Validation complete: 0 errors, 1 warning";
+
+            return;
+        }
+
         MessageBox.Show(
-            "Validation complete.\n\n0 errors\n3 sample warnings",
+            "Validation complete.\n\n" +
+            "0 errors\n" +
+            "3 sample warnings\n\n" +
+            $"{deviceCount} device(s) checked.",
             "HarnessForge Validation",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
 
-        StatusText.Text = "Validation complete: 0 errors, 3 warnings";
+        StatusText.Text =
+            $"Validation complete: {deviceCount} device(s), " +
+            "0 errors, 3 warnings";
     }
 
-    private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+    private void ExitMenuItem_Click(
+        object sender,
+        RoutedEventArgs e)
     {
         Close();
     }
