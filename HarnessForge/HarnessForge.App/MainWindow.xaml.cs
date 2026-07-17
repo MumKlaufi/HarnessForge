@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using HarnessForge.App.Models;
+using HarnessForge.App.Services;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace HarnessForge.App;
@@ -439,10 +442,13 @@ public partial class MainWindow : Window
             return;
         }
 
+        DeviceDefinition definition =
+            DeviceFactory.CreateMaxxEcuRaceDefinition();
+
         string deviceName =
             _deviceNumber == 1
-                ? "MaxxECU Race"
-                : $"MaxxECU Race {_deviceNumber}";
+                ? definition.Name
+                : $"{definition.Name} {_deviceNumber}";
 
         TreeViewItem connectorsNode = new()
         {
@@ -451,25 +457,13 @@ public partial class MainWindow : Window
             IsExpanded = true
         };
 
-        connectorsNode.Items.Add(
-            CreateConnectorNode(
-                connectorName: "Connector A",
-                cavityCount: 34));
-
-        connectorsNode.Items.Add(
-            CreateConnectorNode(
-                connectorName: "Connector B",
-                cavityCount: 34));
-
-        connectorsNode.Items.Add(
-            CreateConnectorNode(
-                connectorName: "Connector C",
-                cavityCount: 28));
-
-        connectorsNode.Items.Add(
-            CreateConnectorNode(
-                connectorName: "Connector D",
-                cavityCount: 28));
+        foreach (ConnectorDefinition connector in definition.Connectors)
+        {
+            connectorsNode.Items.Add(
+                CreateConnectorNode(
+                    connectorName: connector.Name,
+                    cavityCount: connector.PinCount));
+        }
 
         TreeViewItem deviceNode = new()
         {
@@ -488,8 +482,14 @@ public partial class MainWindow : Window
         deviceNode.IsSelected = true;
         deviceNode.BringIntoView();
 
+        int totalPins =
+            definition.Connectors.Sum(
+                connector => connector.PinCount);
+
         StatusText.Text =
-            $"Added {deviceName}: 4 connectors and 124 pins generated";
+            $"Added {deviceName}: " +
+            $"{definition.Connectors.Count} connectors and " +
+            $"{totalPins} pins generated";
     }
 
     private static TreeViewItem CreateConnectorNode(
